@@ -354,8 +354,69 @@ Este modelo tem finalidade **educacional e experimental**. Não deve ser usado c
 
 ---
 
-## Licença e autor
+## Licença
 
 **[MIT License](LICENSE)**
 
-**Sidnei Alves de Almeida** — desenvolvido como demonstração de pipeline completo de Object Detection com Ultralytics YOLO.
+---
+
+## Autores
+
+<p align="center">
+  <em>Projeto de visão computacional — detecção de ameaças com YOLO26, Roboflow e FastAPI.</em>
+</p>
+
+<p align="center">
+  <table>
+    <tr>
+      <td align="center" width="320">
+        <a href="https://github.com/filipecunhaadv">
+          <img src="https://github.com/filipecunhaadv.png" width="110" height="110" alt="Filipe Cunha" style="border-radius: 50%;" />
+        </a>
+        <br /><br />
+        <strong>Filipe Cunha</strong>
+        <br />
+        <a href="https://github.com/filipecunhaadv"><code>@filipecunhaadv</code></a>
+        <br /><br />
+        <sub>Dono do repositório · Rio de Janeiro/RJ</sub>
+        <br />
+        <sub>Advogado em transição para Dados, Data Science &amp; IA aplicada</sub>
+        <br /><br />
+        <a href="https://github.com/filipecunhaadv">
+          <img src="https://img.shields.io/badge/GitHub-filipecunhaadv-181717?logo=github&logoColor=white" alt="GitHub filipecunhaadv" />
+        </a>
+        &nbsp;
+        <a href="https://www.linkedin.com/in/advfilipecunha">
+          <img src="https://img.shields.io/badge/LinkedIn-advfilipecunha-0A66C2?logo=linkedin&logoColor=white" alt="LinkedIn" />
+        </a>
+      </td>
+      <td align="center" width="80">
+        <br />
+        <sub>✦</sub>
+      </td>
+      <td align="center" width="320">
+        <a href="https://github.com/sidnei-almeida">
+          <img src="https://github.com/sidnei-almeida.png" width="110" height="110" alt="Sidnei Alves de Almeida" style="border-radius: 50%;" />
+        </a>
+        <br /><br />
+        <strong>Sidnei Alves de Almeida</strong>
+        <br />
+        <a href="https://github.com/sidnei-almeida"><code>@sidnei-almeida</code></a>
+        <br /><br />
+        <sub>Desenvolvimento do pipeline ML &amp; API</sub>
+        <br />
+        <sub>Object Detection · Ultralytics YOLO · FastAPI</sub>
+        <br /><br />
+        <a href="https://github.com/sidnei-almeida">
+          <img src="https://img.shields.io/badge/GitHub-sidnei--almeida-181717?logo=github&logoColor=white" alt="GitHub sidnei-almeida" />
+        </a>
+      </td>
+    </tr>
+  </table>
+</p>
+
+<p align="center">
+  <a href="https://github.com/filipecunhaadv/yolo26-weapon-threat-detection">
+    <img src="https://img.shields.io/badge/Repositório-yolo26--weapon--threat--detection-ef4444?style=for-the-badge&logo=github&logoColor=white" alt="Repositório" />
+  </a>
+</p>
