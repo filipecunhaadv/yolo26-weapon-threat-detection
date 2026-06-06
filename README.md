@@ -410,6 +410,10 @@ Este modelo tem finalidade **educacional e experimental**. Não deve ser usado c
         <a href="https://github.com/sidnei-almeida">
           <img src="https://img.shields.io/badge/GitHub-sidnei--almeida-181717?logo=github&logoColor=white" alt="GitHub sidnei-almeida" />
         </a>
+        &nbsp;
+        <a href="https://www.linkedin.com/in/saaelmeida93/">
+          <img src="https://img.shields.io/badge/LinkedIn-saaelmeida93-0A66C2?logo=linkedin&logoColor=white" alt="LinkedIn Sidnei Almeida" />
+        </a>
       </td>
     </tr>
   </table>
