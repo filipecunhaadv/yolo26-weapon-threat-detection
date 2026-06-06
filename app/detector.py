@@ -17,6 +17,10 @@ THREAT_WEIGHTS = {
     "person_with_mask": 0.6,
 }
 
+# Bônus por detecção adicional além da primeira (máx. +0.30)
+QUANTITY_BONUS_PER_DETECTION = 0.05
+MAX_QUANTITY_BONUS = 0.30
+
 
 class WeaponThreatDetector:
     def __init__(self, model_path: Path = DEFAULT_MODEL_PATH) -> None:
@@ -61,10 +65,14 @@ class WeaponThreatDetector:
                     )
                 )
 
-        threat_score, threat_level = self._assess_threat(detections)
+        threat_score, threat_level, detection_count, class_counts = self._assess_threat(
+            detections
+        )
 
         return PredictResponse(
             detections=detections,
+            detection_count=detection_count,
+            class_counts=class_counts,
             threat_level=threat_level,
             threat_score=threat_score,
             image_width=width,
@@ -107,10 +115,14 @@ class WeaponThreatDetector:
                 )
 
         annotated = Image.fromarray(results[0].plot())
-        threat_score, threat_level = self._assess_threat(detections)
+        threat_score, threat_level, detection_count, class_counts = self._assess_threat(
+            detections
+        )
 
         response = PredictResponse(
             detections=detections,
+            detection_count=detection_count,
+            class_counts=class_counts,
             threat_level=threat_level,
             threat_score=threat_score,
             image_width=width,
@@ -119,21 +131,50 @@ class WeaponThreatDetector:
         )
         return response, annotated
 
-    def _assess_threat(self, detections: list[Detection]) -> tuple[float, str]:
+    def _assess_threat(
+        self, detections: list[Detection]
+    ) -> tuple[float, str, int, dict[str, int]]:
         if not detections:
-            return 0.0, "none"
+            return 0.0, "none", 0, {}
 
-        scores = [
+        class_counts: dict[str, int] = {}
+        for det in detections:
+            class_counts[det.class_name] = class_counts.get(det.class_name, 0) + 1
+
+        detection_count = len(detections)
+        individual_scores = [
             det.confidence * THREAT_WEIGHTS.get(det.class_name, 0.5)
             for det in detections
         ]
-        threat_score = max(scores)
+        peak_score = max(individual_scores)
+        quantity_bonus = min(
+            (detection_count - 1) * QUANTITY_BONUS_PER_DETECTION,
+            MAX_QUANTITY_BONUS,
+        )
+        threat_score = min(peak_score + quantity_bonus, 1.0)
+        threat_level = self._resolve_threat_level(
+            threat_score, detection_count, class_counts
+        )
 
-        if threat_score >= 0.75:
-            return round(threat_score, 4), "high"
-        if threat_score >= 0.45:
-            return round(threat_score, 4), "medium"
-        return round(threat_score, 4), "low"
+        return round(threat_score, 4), threat_level, detection_count, class_counts
+
+    @staticmethod
+    def _resolve_threat_level(
+        threat_score: float,
+        detection_count: int,
+        class_counts: dict[str, int],
+    ) -> str:
+        gun_count = class_counts.get("gun", 0)
+        knife_count = class_counts.get("knife", 0)
+        weapon_count = gun_count + knife_count
+
+        if threat_score >= 0.85 and detection_count >= 4:
+            return "critical"
+        if threat_score >= 0.75 or (weapon_count >= 3 and threat_score >= 0.55):
+            return "high"
+        if threat_score >= 0.45 or (detection_count >= 3 and threat_score >= 0.35):
+            return "medium"
+        return "low"
 
     @staticmethod
     def image_to_base64(image: Image.Image, fmt: str = "JPEG") -> str:

@@ -63,14 +63,23 @@ O pipeline completo — do dataset Roboflow ao deploy no Hugging Face — está 
 | `1` | `knife` | Faca ou objeto cortante | 0.85 |
 | `2` | `person_with_mask` | Pessoa com máscara / balaclava | 0.60 |
 
-O `threat_score` é calculado como `max(confidence × peso_classe)` entre todas as detecções. O `threat_level` segue:
+O `threat_score` combina **tipo do item** e **quantidade de detecções**:
+
+```text
+peak_score     = max(confidence × peso_classe)
+quantity_bonus = min((detection_count - 1) × 0.05, 0.30)
+threat_score   = min(peak_score + quantity_bonus, 1.0)
+```
+
+O `threat_level` considera score agregado **e** contagem:
 
 | Nível | Condição |
 |-------|----------|
 | `none` | Nenhuma detecção |
-| `low` | score &lt; 0.45 |
-| `medium` | 0.45 ≤ score &lt; 0.75 |
-| `high` | score ≥ 0.75 |
+| `low` | score &lt; 0.45 e poucas detecções |
+| `medium` | score ≥ 0.45 **ou** ≥ 3 detecções com score ≥ 0.35 |
+| `high` | score ≥ 0.75 **ou** ≥ 3 armas (gun/knife) com score ≥ 0.55 |
+| `critical` | score ≥ 0.85 **e** ≥ 4 detecções totais |
 
 ---
 
@@ -182,8 +191,12 @@ Documentação interativa: **`GET /docs`** · Contrato OpenAPI: **`GET /openapi.
       }
     }
   ],
-  "threat_level": "high",
-  "threat_score": 0.8677,
+  "detection_count": 6,
+  "class_counts": {
+    "gun": 6
+  },
+  "threat_level": "critical",
+  "threat_score": 1.0,
   "image_width": 1920,
   "image_height": 1100,
   "inference_ms": 277.11
@@ -195,6 +208,8 @@ Documentação interativa: **`GET /docs`** · Contrato OpenAPI: **`GET /openapi.
 ```json
 {
   "detections": [],
+  "detection_count": 0,
+  "class_counts": {},
   "threat_level": "none",
   "threat_score": 0.0,
   "image_width": 1600,
@@ -215,8 +230,10 @@ Adiciona o campo `annotated_image_base64` — string JPEG em base64 com bounding
 | `detections[].class_name` | string | `model.names[class_id]` |
 | `detections[].confidence` | float | `box.conf` (0–1) |
 | `detections[].bbox` | object | `box.xyxy` — canto superior-esquerdo e inferior-direito em **pixels absolutos** |
-| `threat_level` | string | Regra de negócio da API |
-| `threat_score` | float | `max(conf × peso_classe)` |
+| `detection_count` | int | Total de bounding boxes retornadas |
+| `class_counts` | object | Contagem por classe (`gun`, `knife`, `person_with_mask`) |
+| `threat_level` | string | `none` · `low` · `medium` · `high` · `critical` |
+| `threat_score` | float | `peak_score + bônus por quantidade` (cap 1.0) |
 | `image_width` / `image_height` | int | Dimensões da imagem de entrada |
 | `inference_ms` | float | Tempo total de inferência |
 
@@ -245,6 +262,7 @@ with open("imagem.jpg", "rb") as f:
 data = response.json()
 for det in data["detections"]:
     print(f"{det['class_name']}: {det['confidence']:.2%} @ {det['bbox']}")
+print(f"Total: {data['detection_count']} | Por classe: {data['class_counts']}")
 print(f"Risco: {data['threat_level']} ({data['threat_score']})")
 ```
 

@@ -17,6 +17,8 @@ class Detection(BaseModel):
 
 class PredictResponse(BaseModel):
     detections: list[Detection]
+    detection_count: int = Field(ge=0)
+    class_counts: dict[str, int]
     threat_level: str
     threat_score: float = Field(ge=0.0, le=1.0)
     image_width: int
